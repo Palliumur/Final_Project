@@ -3,12 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-<<<<<<< HEAD
-  tags:
-  - Ground
-=======
   tags: []
->>>>>>> e720f1f14d766a59ea2cbd975018ec8e57944f58
   layers:
   - Default
   - TransparentFX
