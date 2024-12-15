@@ -4,44 +4,40 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float speed;
+    [SerializeField] private float horizontalSpeed;
+    [SerializeField] private float jumpSpeed;
     private Rigidbody2D body;
     private Animator anim;
-    private bool Grounded;
+    private Foot foot;
+    private bool grounded => foot.grounded;
 
     private void Start()
     {
         body = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        foot = GetComponentInChildren<Foot>();
     }
 
     private void Update()
     {
         float horizontalInput = Input.GetAxisRaw("Horizontal");
-        body.velocity = new Vector2(horizontalInput * speed, body.velocity.y);
+        body.velocity = new Vector2(horizontalInput * horizontalSpeed, body.velocity.y);
 
-        if(horizontalInput > 0.01f)
+        if (horizontalInput > 0.01f)
             transform.localScale = Vector3.one;
-        else if(horizontalInput < -0.01f)
+        else if (horizontalInput < -0.01f)
             transform.localScale = new Vector3(-1, 1, 1);
-        
-        if(Input.GetKeyDown(KeyCode.Space) && Grounded)
+
+        if (Input.GetKeyDown(KeyCode.Space) && grounded)
             Jump();
 
         anim.SetBool("Run", horizontalInput != 0);
-        anim.SetBool("Grounded", Grounded);
+        anim.SetBool("Grounded", grounded);
     }
 
     private void Jump()
     {
-        body.velocity = new Vector2(body.velocity.x, speed);
+        body.velocity = new Vector2(body.velocity.x, jumpSpeed);
         anim.SetTrigger("Jump");
-        Grounded = false;
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if(collision.gameObject.CompareTag("Ground"))
-            Grounded = true;
     }
 }

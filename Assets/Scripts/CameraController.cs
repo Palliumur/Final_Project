@@ -16,5 +16,6 @@ public class CameraController : MonoBehaviour
     public void MovetoNextRoom(Transform _nextRoom)
     {
         currentPosX = _nextRoom.position.x;
+        Debug.Log(currentPosX);
     }
 }
