@@ -7,6 +7,7 @@ public class PlayerRespawn : MonoBehaviour
     private Vector3 respawnPosition; // 复活位置
     // public GameObject deathEffect;   // 可选：死亡特效
     public FallingObject[] fallingObjects; // 引用所有下落的方块
+    public GroundMover[] groundMovers; // 引用所有地面控制器
 
     private void Start()
     {
@@ -47,6 +48,12 @@ public class PlayerRespawn : MonoBehaviour
         if (rb != null)
         {
             rb.velocity = Vector2.zero;
+        }
+
+        // 重置所有地面
+        foreach (GroundMover groundMover in groundMovers)
+        {
+            groundMover.ResetGroundPosition(); // 归位地面
         }
     }
 }
