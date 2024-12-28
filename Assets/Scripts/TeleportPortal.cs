@@ -12,6 +12,8 @@ public class TeleportPortal : MonoBehaviour
         {
             other.transform.position = targetPosition.position;
             Debug.Log("Player teleported to " + targetPosition.position);
+            var p = other.GetComponent<PlayerMovement>();
+            StartCoroutine(p.WaitForSec(2f));
         }
     }
 }

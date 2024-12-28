@@ -35,5 +35,10 @@ public class FallingObject : MonoBehaviour
         transform.position = initialPosition;
         isFalling = false;
     }
-}
 
+    public void StopFalling()
+    {
+        // 停止下落
+        isFalling = false;
+    }
+}

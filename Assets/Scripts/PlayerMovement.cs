@@ -6,6 +6,9 @@ public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float horizontalSpeed;
     [SerializeField] private float jumpSpeed;
+    [SerializeField] private AudioClip jumpSFX;
+    public bool movable;
+    private AudioSource audioSource;
     private Rigidbody2D body;
     private Animator anim;
     private Foot foot;
@@ -16,10 +19,18 @@ public class PlayerMovement : MonoBehaviour
         body = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         foot = GetComponentInChildren<Foot>();
+        audioSource = GetComponent<AudioSource>();
+        movable = true;
     }
 
     private void Update()
     {
+        if (!movable)
+        {
+            body.velocity = new Vector2(0, body.velocity.y);
+            anim.SetBool("Run", false);
+            return;
+        }
         float horizontalInput = Input.GetAxisRaw("Horizontal");
         body.velocity = new Vector2(horizontalInput * horizontalSpeed, body.velocity.y);
 
@@ -39,5 +50,14 @@ public class PlayerMovement : MonoBehaviour
     {
         body.velocity = new Vector2(body.velocity.x, jumpSpeed);
         anim.SetTrigger("Jump");
+        audioSource.clip = jumpSFX;
+        audioSource.Play();
+    }
+
+    public IEnumerator WaitForSec(float sec)
+    {
+        movable = false;
+        yield return new WaitForSeconds(sec);
+        movable = true;
     }
 }
