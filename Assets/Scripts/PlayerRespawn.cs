@@ -1,20 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class PlayerRespawn : MonoBehaviour
 {
     public static PlayerRespawn instance;
-    private Vector3 respawnPosition; // 复活位置
-    // public GameObject deathEffect;   // 可选：死亡特效
-    public FallingObject[] fallingObjects; // 引用所有下落的方块
-    public GroundMover[] groundMovers; // 引用所有地面控制器
+    private Vector3 respawnPosition;
+    public FallingObject[] fallingObjects;
+    public GroundMover[] groundMovers;
     public UnityEvent onPlayerRespawn;
     public GameObject RestartUI;
     private bool isDead;
     public AudioClip dieSFX, respawnSFX;
     private AudioSource audioSource;
+    public bool hasEatenApple = false;
+    private bool isInAppleTime = false;
+    private bool diedAfterApple = false;
+    public bool notDiedAfterApple = false;
+
+    // 新增重生计数
+    public int respawnCount = 0;  // 记录重生次数
+    private bool achievement1Triggered = false;  // 用于确保成就只触发一次
+    private bool achievement2Triggered = false;
+    public GameObject achievementUI1;  // 用于显示成就弹框
+    public GameObject achievementUI2;
+    public GameObject achievementUI3;
 
     private void Awake()
     {
@@ -25,7 +37,18 @@ public class PlayerRespawn : MonoBehaviour
     private void Start()
     {
         isDead = false;
-        respawnPosition = transform.position; // 初始复活点
+        respawnPosition = transform.position;
+        achievementUI1.SetActive(false);  // 初始时隐藏成就弹框
+        achievementUI2.SetActive(false);
+        achievementUI3.SetActive(false);
+    }
+    private void Update()
+    {
+        if (notDiedAfterApple && !achievement2Triggered)
+        {
+            ShowAchievementUI3();
+            achievement2Triggered = true;  // 确保成就只触发一次
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -34,12 +57,30 @@ public class PlayerRespawn : MonoBehaviour
         {
             if (isDead) return;
             isDead = true;
+            if (isInAppleTime && !achievement2Triggered)
+            {
+                diedAfterApple = true;  // 标记玩家死亡后是否在2秒内
+            }
             StartCoroutine(Die());
         }
         else if (other.CompareTag("RespawnZone"))
         {
-            respawnPosition = other.transform.position; // 更新复活点
+            respawnPosition = other.transform.position;
         }
+    }
+    public void StartAppleTimer()
+    {
+        if (hasEatenApple)
+        {
+            isInAppleTime = true;
+            StartCoroutine(AppleTimer());
+        }
+    }
+    private IEnumerator AppleTimer()
+    {
+        yield return new WaitForSeconds(2f); // 等待2秒
+        isInAppleTime = false;
+        notDiedAfterApple = true;
     }
 
     private IEnumerator Die()
@@ -48,8 +89,6 @@ public class PlayerRespawn : MonoBehaviour
 
         audioSource.clip = dieSFX;
         audioSource.Play();
-
-        // 停止所有正在下落的方块
 
         yield return WaitForAnyInput();
 
@@ -74,30 +113,39 @@ public class PlayerRespawn : MonoBehaviour
         audioSource.Play();
 
         StopAllFallingObjects();
-
-        // 恢复玩家到复活点
         transform.position = respawnPosition;
-
-        // 重置所有下落方块的位置
         foreach (FallingObject obj in fallingObjects)
         {
             obj.ResetPosition();
         }
-
-        // 重置玩家速度，防止惯性影响
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb != null)
         {
             rb.velocity = Vector2.zero;
         }
-
-        // 重置所有地面
         foreach (GroundMover groundMover in groundMovers)
         {
-            groundMover.ResetGroundPosition(); // 归位地面
+            groundMover.ResetGroundPosition();
         }
 
-        onPlayerRespawn.Invoke();
+        // 增加重生次数
+        respawnCount++;
+
+        // 检查是否已经达到 10 次重生
+        if (respawnCount >= 10 && !achievement1Triggered)
+        {
+            ShowAchievementUI1();
+            achievement1Triggered = true;  // 确保成就只触发一次
+        }
+        else if (diedAfterApple && !achievement2Triggered)
+        {
+            ShowAchievementUI2();
+            achievement2Triggered = true;  // 确保成就只触发一次
+        }
+        else
+        {
+            onPlayerRespawn.Invoke();
+        }
     }
 
     private void StopAllFallingObjects()
@@ -109,5 +157,31 @@ public class PlayerRespawn : MonoBehaviour
                 obj.StopFalling();
             }
         }
+    }
+
+    // 显示成就弹框
+    private void ShowAchievementUI1()
+    {
+        achievementUI1.SetActive(true);
+        Time.timeScale = 0;  // 暂停游戏
+    }
+    private void ShowAchievementUI2()
+    {
+        achievementUI2.SetActive(true);
+        Time.timeScale = 0;  // 暂停游戏
+    }
+    private void ShowAchievementUI3()
+    {
+        achievementUI3.SetActive(true);
+        Time.timeScale = 0;  // 暂停游戏
+    }
+
+// 按 Enter 键关闭成就弹框
+public void CloseAchievementUI()
+    {
+        achievementUI1.SetActive(false);
+        achievementUI2.SetActive(false);
+        achievementUI3.SetActive(false);
+        Time.timeScale = 1;  // 恢复游戏
     }
 }

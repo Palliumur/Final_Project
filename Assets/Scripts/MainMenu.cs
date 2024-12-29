@@ -13,6 +13,14 @@ public class MainMenu : MonoBehaviour
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
+    public void Achievements()
+    {
+        SceneManager.LoadScene("Achievements");
+    }
+    public void Return()
+    {
+        SceneManager.LoadScene("_Main Menu");
+    }
     public void Quit()
     {
         Application.Quit();
