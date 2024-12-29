@@ -5,6 +5,12 @@ using UnityEngine;
 public class End : MonoBehaviour
 {
     private bool hasPlayedAnim = false;
+    private UIManager uiManager;
+
+    private void Awake() 
+    {
+        uiManager = FindObjectOfType<UIManager>();
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -15,6 +21,7 @@ public class End : MonoBehaviour
             other.GetComponent<Collider2D>().enabled = false;
             other.GetComponent<Animator>().SetTrigger("Appear");
             GetComponent<PlayerMovement>().movable = false;
+            uiManager.ShowVictoryUI();
             Victory.instance.PlaySound();
         }
     }

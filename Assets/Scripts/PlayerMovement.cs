@@ -20,7 +20,7 @@ public class PlayerMovement : MonoBehaviour
         anim = GetComponent<Animator>();
         foot = GetComponentInChildren<Foot>();
         audioSource = GetComponent<AudioSource>();
-        movable = true;
+        movable = false;
     }
 
     private void Update()
