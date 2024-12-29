@@ -63,6 +63,11 @@ public class UIManager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
+    public void Pausegame()
+    {
+        PauseGame(true);
+    }
+
     public void Quit()
     {
         Application.Quit();
