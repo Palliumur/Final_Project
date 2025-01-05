@@ -20,6 +20,7 @@ public class PlayerRespawn : MonoBehaviour
     private bool diedAfterApple = false;
     public bool notDiedAfterApple = false;
     public GameObject Apple;
+    public HidenitemTrigger hiddenItemTrigger;
 
     // 新增重生计数
     public int respawnCount = 0;  // 记录重生次数
@@ -115,6 +116,10 @@ public class PlayerRespawn : MonoBehaviour
 
         StopAllFallingObjects();
         transform.position = respawnPosition;
+        if (hiddenItemTrigger != null)
+        {
+            hiddenItemTrigger.HideItems(); // 物品重新隐藏
+        }
         if (Apple != null)
         {
             Apple.SetActive(false);
